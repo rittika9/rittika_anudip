@@ -1,0 +1,24 @@
+create database anp_d6152;
+use anp_d6152;
+create table student(s_id int, sname varchar(15), sage int);
+desc student;
+select * from student;
+insert into student values (101,"Amit",20);
+insert into student values (102,"Rahul",20), (103,"Kavita",21);
+insert into student values (104,"Bimal",null);
+insert into student (s_id,sage)values(105,20);
+alter table student add (address varchar(15));
+Alter table student add(father_name varchar(60),mother_name varchar(60),dob date);
+alter table student modify address varchar(300);
+alter table student change address location varchar(20);
+rename table student to student_info;
+desc student_info;
+rename table student_info to student;
+select * from student;
+alter table student drop father_name;
+alter table student drop mother_name;
+alter table student drop dob;
+insert into student values (101,"Amit",20,"Mumbai");
+insert into student values (102,"Rahul",20,"kolkata"), (103,"Kavita",21,"Mumbai");
+update student set location='kolkata' where s_id=102;
+

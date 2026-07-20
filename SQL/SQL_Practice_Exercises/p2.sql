@@ -112,49 +112,146 @@ select PassengerName,Age from Passenger order by Age asc;
 select JourneyDate,Fare from  Booking order by JourneyDate desc , Fare desc ;
 
 -- WHERE & LOGICAL OPERATORS (6–10)
--- 1.Display passengers whose age is greater than 30.
+-- 6.Display passengers whose age is greater than 30.
 select PassengerName,Age from Passenger where Age>30;
 
--- 2.Show bookings where the fare is between 800 and 1500.
-select fare from Bookings where fare between 800 and 1500;
+-- 7.Show bookings where the fare is between 800 and 1500.
+select fare from Booking where fare between 800 and 1500;
 
--- Display trains whose source is Kolkata or Delhi.
--- Display confirmed bookings with fare greater than 1000.
--- Display passengers who are Female and younger than 30.
+-- 8.Display trains whose source is Kolkata or Delhi.
+ SELECT TrainName ,Source FROM Train  WHERE Source IN ('Kolkata', 'Delhi');
+
+-- 9.Display confirmed bookings with fare greater than 1000.
+select * from Booking where BookingStatus="confirmed" and Fare>1000;
+
+-- 10.Display passengers who are Female and younger than 30.
+select *from Passenger where Gender="Female" and Age<30;
 -- LIKE OPERATOR (11–15)
--- Display passengers whose names start with A.
--- Display train names ending with Express.
--- Display passengers whose city contains 'ta'.
--- Display train names containing 'Raj'.
--- Display passengers whose names have 5 letters.
+-- 11.Display passengers whose names start with A.
+select * from Passenger where PassengerName like "A%";
+
+-- 12.Display train names ending with Express.
+select * from Train where TrainName like "%Express";
+
+-- 13.Display passengers whose city contains 'ta'.
+select * from Passenger where City like "%ta%";
+
+-- 14.Display train names containing 'Raj'.
+select * from Train where TrainName like "%Raj%";
+
+-- 15.Display passengers whose names have 5 letters.
+select PassengerName from Passenger where length(PassengerName)=10;
 -- AGGREGATE FUNCTIONS (16–20)
--- Find the total number of passengers.
--- Find the average fare of all bookings.
--- Find the maximum fare.
--- Find the minimum passenger age.
--- Find the total fare collected from confirmed bookings.
+-- 16.Find the total number of passengers.
+select count(PassengerID) from Passenger;
+
+-- 17.Find the average fare of all bookings.
+select avg(Fare) from Booking;
+
+-- 18.Find the maximum fare.
+select max(Fare) from Booking;
+
+-- 19.Find the minimum passenger age.
+select min(Age) from Passenger;
+
+-- 20.Find the total fare collected from confirmed bookings.
+SELECT SUM(Fare) AS total_fare_collected FROM Booking WHERE BookingStatus = 'Confirmed';
+
 -- GROUP BY (21–25)
--- Count passengers in each city.
--- Count bookings for each booking status.
--- Find the average fare for each booking status.
--- Count trains available from each source.
--- Find the highest fare for each coach.
+-- 21.Count passengers in each city.
+select City,count(PassengerID) from Passenger group by City;
+
+-- 22.Count bookings for each booking status.
+select count(BookingID) ,BookingStatus from Booking group by BookingStatus;
+
+-- 23.Find the average fare for each booking status.
+select avg(Fare),BookingStatus from Booking  group by BookingStatus;
+
+-- 24.Count trains available from each source.
+select count(TrainID) ,source from Train group by source;
+
+-- 25.Find the highest fare for each coach.
+select max(fare) as Highest_fare ,coach from Booking group by coach;
+
 -- HAVING (26–30)
--- Display cities having more than one passenger.
--- Display booking statuses having more than two bookings.
--- Show coaches whose average fare is greater than 1000.
--- Display sources having more than one train.
--- Show booking statuses whose total fare exceeds 2000.
+-- 26.Display cities having more than one passenger.
+select City,count(PassengerID) from Passenger group by City having count(PassengerID)>1 ;
+
+-- 27.Display booking statuses having more than two bookings.
+select count(BookingID) as booking_statuses ,BookingStatus from Booking group by BookingStatus having booking_statuses>2 ;
+
+-- 28.Show coaches whose average fare is greater than 1000.
+select avg(fare) as average_fare ,coach from Booking group by coach having average_fare>1000;
+
+-- 29.Display sources having more than one train.
+select count(TrainID) as numberoftrains ,source from Train group by source having numberoftrains>1 ;
+ 
+-- 30.Show booking statuses whose total fare exceeds 2000.
+SELECT BookingStatus, SUM(fare) AS total_fare FROM Booking GROUP BY BookingStatus HAVING SUM(fare) > 2000;
+
 -- JOINS (31–34)
--- Display passenger names along with their train names.
--- Display passenger name, city, train name, and fare.
--- Display all confirmed bookings with passenger and train details.
--- Display train name, passenger name, and booking status.
+-- 31.Display passenger names along with their train names.
+select p.PassengerName,t.TrainName 
+from Booking b join Passenger p on p.PassengerID=b.PassengerID
+ join Train t on t.TrainID=b.TrainID ; 
+
+-- 32.Display passenger name, city, train name, and fare.
+select p.PassengerName,p.City,t.TrainName ,b.fare
+from Booking b 
+join Passenger p on p.PassengerID=b.PassengerID
+join train t on t.TrainID=b.TrainID;
+
+-- 33.Display all confirmed bookings with passenger and train details.
+select p.PassengerName,t.TrainName,b.BookingStatus
+from Booking b 
+join Passenger p on p.PassengerID=b.PassengerID
+join train t on t.TrainID=b.TrainID
+where b.BookingStatus="confirmed";
+
+-- 34.Display train name, passenger name, and booking status.
+select p.PassengerName,t.TrainName,b.BookingStatus
+from Booking b 
+join Passenger p on p.PassengerID=b.PassengerID
+join train t on t.TrainID=b.TrainID;
+
 -- SUBQUERIES & ADVANCED EXPRESSIONS (35–38)
--- Find the passenger(s) with the highest age.
--- Find the booking(s) with the highest fare.
--- Display passengers who booked the same train as Amit Sharma.
--- Display trains whose fare is greater than the average fare of all bookings.
+-- 35.Find the passenger(s) with the highest age.
+select PassengerName from Passenger where Age=(select max(Age) from Passenger);
+
+-- 36.Find the booking(s) with the highest fare.
+select * from Booking where Fare=(select max(Fare) from Booking);
+
+-- 37.Display passengers who booked the same train as Amit Sharma.
+SELECT p.PassengerName, t.TrainName 
+FROM Booking b 
+JOIN Passenger p ON p.PassengerID = b.PassengerID 
+JOIN Train t ON t.TrainID = b.TrainID 
+WHERE b.TrainID IN (
+    SELECT b2.TrainID 
+    FROM Booking b2 
+    JOIN Passenger p2 ON p2.PassengerID = b2.PassengerID 
+    WHERE p2.PassengerName = 'Amit Sharma'
+)
+AND p.PassengerName != 'Amit Sharma';
+
+SELECT PassengerName
+FROM Passenger
+WHERE PassengerID IN (
+SELECT PassengerID
+FROM Booking
+WHERE TrainID = (
+SELECT TrainID
+FROM Booking
+WHERE PassengerID = (
+SELECT PassengerID
+FROM Passenger
+WHERE PassengerName='Amit Sharma'
+)
+)
+);
+
+-- 38.Display trains whose fare is greater than the average fare of all bookings.
+
 -- VIEW, LIMIT & MIXED QUERIES (39–40)
 -- Create a view named ConfirmedBookings that displays only confirmed bookings with passenger and train details.
 -- Display the top 5 highest-fare bookings.

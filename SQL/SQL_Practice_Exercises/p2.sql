@@ -251,9 +251,34 @@ WHERE PassengerName='Amit Sharma'
 );
 
 -- 38.Display trains whose fare is greater than the average fare of all bookings.
+ select b.Fare,p.PassengerName,t.TrainName
+FROM Booking b 
+JOIN Passenger p ON p.PassengerID = b.PassengerID 
+JOIN Train t ON t.TrainID = b.TrainID  
+where b.Fare>(select avg(b1.Fare) from Booking b1);
 
+SELECT *
+FROM Booking
+WHERE Fare >
+(
+SELECT AVG(Fare)
+FROM Booking
+);
+ 
 -- VIEW, LIMIT & MIXED QUERIES (39–40)
--- Create a view named ConfirmedBookings that displays only confirmed bookings with passenger and train details.
--- Display the top 5 highest-fare bookings.
--- MySQL/PostgreSQL: use LIMIT 5
--- SQL Server: use TOP 5
+-- 39. Create a view named ConfirmedBookings that displays only confirmed bookings with passenger and train details.
+create view ConfirmedBookings as 
+select b.BookingStatus,p.*,t.* 
+FROM Booking b 
+JOIN Passenger p ON p.PassengerID = b.PassengerID 
+JOIN Train t ON t.TrainID = b.TrainID 
+where BookingStatus="confirmed";
+SELECT * FROM ConfirmedBookings;
+
+-- 40. Display the top 5 highest-fare bookings.
+select b.Fare,p.PassengerName,t.TrainName
+FROM Booking b 
+JOIN Passenger p ON p.PassengerID = b.PassengerID 
+JOIN Train t ON t.TrainID = b.TrainID  
+order by b.Fare desc
+limit 5;
